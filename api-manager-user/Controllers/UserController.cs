@@ -15,6 +15,7 @@ namespace api_manager_user.Controllers
         {
             _userRepository = userRepository;
         }
+
         [HttpGet]
         public async Task<ActionResult<List<User>>> ListAll()
         {
@@ -32,8 +33,17 @@ namespace api_manager_user.Controllers
         [HttpPost]
         public async Task<ActionResult<List<User>>> Insert([FromBody] User user)
         {
-            User userModel = await _userRepository.Create(user);
-            return Ok(userModel);
+            bool existsEmail = (bool) await _userRepository.VerifyEmailExistent(user.email);
+
+            if (existsEmail)
+            {
+                return BadRequest(new { message = "O e-mail já está cadastrado." });
+            }
+            else
+            {
+                User userModel = await _userRepository.Create(user);
+                return Ok(userModel);
+            }
         }
 
         [HttpPut("{id}")]
@@ -49,5 +59,6 @@ namespace api_manager_user.Controllers
             User userModel = await _userRepository.Delete(id);
             return Ok(userModel);
         }
+
     }
 }

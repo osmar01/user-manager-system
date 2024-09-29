@@ -7,5 +7,6 @@
         Task<User> Create(User user);
         Task<User?> Update(int id, User user);
         Task<User?> Delete(int id);
+        Task<bool?> VerifyEmailExistent(string email);
     }
 }

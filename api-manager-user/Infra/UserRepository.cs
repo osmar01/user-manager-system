@@ -65,7 +65,11 @@ namespace api_manager_user.Infra
             await _context.SaveChangesAsync();
 
             return userId;
+        }
 
+        public async Task<bool?> VerifyEmailExistent(string email)
+        {
+            return await _context.Users.AnyAsync(u => u.email == email);
         }
     }
 }

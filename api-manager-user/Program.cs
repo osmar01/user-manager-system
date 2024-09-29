@@ -50,14 +50,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-//builder.Services.AddTransient<IUserRepository, IUserRepository>();
+builder.Services.AddTransient<IUserRepository, UserRepository>();
 
-var key = Encoding.ASCII.GetBytes(api_manager_user.Key.Secret);
+// Add configuratipn connection data-base ------------
 
 builder.Services.AddDbContext<ConnectionContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
 var app = builder.Build();
