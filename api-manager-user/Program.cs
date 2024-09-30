@@ -5,6 +5,9 @@ using api_manager_user.Models;
 using System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using api_manager_user.Services;
+using api_manager_user.Controllers;
+using api_manager_user.Repository;
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -52,7 +55,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 
-// Add configuratipn connection data-base ------------
+
+// Add configuration connection data-base ------------
 
 builder.Services.AddDbContext<ConnectionContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));

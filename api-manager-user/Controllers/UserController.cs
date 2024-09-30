@@ -41,6 +41,10 @@ namespace api_manager_user.Controllers
             }
             else
             {
+
+                var passwordHash = HashPassword(user.senha);
+                user.senha = passwordHash;
+
                 User userModel = await _userRepository.Create(user);
                 return Ok(userModel);
             }
@@ -49,6 +53,9 @@ namespace api_manager_user.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<List<User>>> Update([FromBody] User user, int id)
         {
+            var passwordHash = HashPassword(user.senha);
+            user.senha = passwordHash;
+
             User userModel = await _userRepository.Update(id,user);
             return Ok(userModel);
         }
@@ -58,6 +65,11 @@ namespace api_manager_user.Controllers
         {
             User userModel = await _userRepository.Delete(id);
             return Ok(userModel);
+        }
+
+        public static string HashPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password);
         }
 
     }

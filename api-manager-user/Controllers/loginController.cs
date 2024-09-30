@@ -1,9 +1,12 @@
 ﻿using api_manager_user.Dto;
+using api_manager_user.Infra;
+using api_manager_user.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+
 
 namespace api_manager_user.Controllers
 {
@@ -11,14 +14,40 @@ namespace api_manager_user.Controllers
     [ApiController]
     public class loginController : ControllerBase
     {
-        [HttpPost]
-        public IActionResult login([FromBody] UserDTO user)
+        IUserRepository _userRepository;
+
+        public loginController(IUserRepository userRepository) 
         {
-            if (user.email == "admin@jabil.com" && user.senha == "admin2024")
+            _userRepository = userRepository;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> login([FromBody] UserDTO userDto)
+        {
+            // usuario padrao admin -- -- -- -- --
+            if (userDto.email == "admin@jabil.com" && userDto.senha == "admin2024")
             {
-                var token = generateToken(user);
+                var token = generateToken(userDto);
                 return Ok(new {token});
             }
+
+            User user = await _userRepository.GetUserByEmail(userDto.email);
+
+            if (user == null)
+            {
+                return Unauthorized(new { message = "E-mail ou senha inválidos." });
+            }
+
+            if (VerifyPassword(userDto.senha, user.senha))
+            {
+                UserDTO userToken = new UserDTO();
+                userToken.email = user.email;
+                userToken.senha = user.senha;
+
+                var token = generateToken(userToken);
+                return Ok(new { token });
+            }
+
             return BadRequest();
         }
 
@@ -42,6 +71,11 @@ namespace api_manager_user.Controllers
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public static bool VerifyPassword(string password, string hash)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hash);
         }
     }
 }

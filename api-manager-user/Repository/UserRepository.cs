@@ -1,7 +1,8 @@
-﻿using api_manager_user.Models;
+﻿using api_manager_user.Infra;
+using api_manager_user.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace api_manager_user.Infra
+namespace api_manager_user.Repository
 {
     public class UserRepository : IUserRepository
     {
@@ -43,6 +44,7 @@ namespace api_manager_user.Infra
 
         public async Task<User?> GetById(int id)
         {
+
             return await _context.Users.FirstOrDefaultAsync(x => x.id == id);
 
         }
@@ -71,5 +73,12 @@ namespace api_manager_user.Infra
         {
             return await _context.Users.AnyAsync(u => u.email == email);
         }
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+            return await _context.Users.SingleOrDefaultAsync(u => u.email == email);
+        }
+
+
     }
 }
