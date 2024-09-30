@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using api_manager_user.Services;
 using api_manager_user.Controllers;
 using api_manager_user.Repository;
+using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -50,7 +51,36 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// ADD configuration swagger -------------------
+
+builder.Services.AddSwaggerGen( c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "api-manager-user", Version = "v1" });
+
+    var securityschema = new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme.",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer",
+        Reference = new OpenApiReference
+        {
+            Id = JwtBearerDefaults.AuthenticationScheme,
+            Type = ReferenceType.SecurityScheme
+
+        }
+    };
+
+    c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, securityschema);
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { securityschema, new string [] { } }
+    });
+
+});
 
 
 builder.Services.AddTransient<IUserRepository, UserRepository>();
